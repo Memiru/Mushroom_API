@@ -7,7 +7,16 @@ plugins {
 
 group = 'io.github.memiru'
 version = '0.0.1-SNAPSHOT'
+
+//Java 17 LTS
 sourceCompatibility = '17'
+targetCompatibility = '17'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
 
 repositories {
     mavenCentral()
@@ -20,7 +29,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.springframework.session:spring-session-core'
     implementation 'org.apache.tomcat.embed:tomcat-embed-jasper'
-    implementation 'javax.servlet:jstl:1.2'
+
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -29,3 +38,65 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+bootWar.enabled(true)
+war.enabled(false)
+
+//war{
+//    archiveName("mushroom.war")
+//}
+
+bootWar{
+    archiveName("mushroom.war")
+}
+
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+//2022 07 26 - React.js Spring boot Build
+
+//frontend - React.js Test Directory
+def reactDir = "$projectDir/src/main/frontend"
+
+sourceSets {
+    main {
+        resources { srcDirs = ["$projectDir/src/main/resources"]
+        }
+    }
+}
+
+processResources { dependsOn('copyReactBuildFiles')}
+
+task installReact(type: Exec) {
+    workingDir("$reactDir")
+    inputs.dir("$reactDir")
+    group = BasePlugin.BUILD_GROUP
+    if(System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')){
+        commandLine("npm.cmd", "audit", "fix")
+        commandLine("npm.cmd", "install")
+    }else{
+        commandLine("npm", "audit", "fix")
+        commandLine("npm", "install")
+    }
+}
+
+task buildReact(type: Exec) {
+    dependsOn("installReact")
+    workingDir("$reactDir")
+    inputs.dir("$reactDir")
+    group = BasePlugin.BUILD_GROUP
+    if(System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')){
+        commandLine("npm.cmd", "run-script", "build")
+    }else{
+        commandLine("npm", "run-script", "build")
+    }
+}
+
+task copyReactBuildFiles(type:Copy){
+    dependsOn("buildReact")
+    from("$reactDir/build")
+    into("$projectDir/src/main/resources/static")
+}
+
