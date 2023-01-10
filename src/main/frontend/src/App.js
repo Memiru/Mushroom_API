@@ -198,7 +198,6 @@ export const App = () => {
             <div className="footer">
                 <div>
                     <font>Data based on NEXON DEVELOPERS</font><br/>
-                    https://github.com/Memiru/Mushroom_API <br/>
                 </div>
             </div>
             <footer></footer>
