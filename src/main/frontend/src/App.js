@@ -199,7 +199,6 @@ export const App = () => {
                 <div>
                     <font>Data based on NEXON DEVELOPERS</font><br/>
                     https://github.com/Memiru/Mushroom_API <br/>
-                    루나 / 고래성이당
                 </div>
             </div>
             <footer></footer>
